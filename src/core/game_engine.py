@@ -1,15 +1,19 @@
 from .paddle import Paddle
 from .ball import Ball
+from .sound_manager import SoundManager
 
 class GameEngine:
     def __init__(self, canvas):
         self.canvas = canvas
         self.WIDTH = 400
         self.HEIGHT = 600
+
+        # Inicializa o gerenciador de som
+        self.sound_manager = SoundManager()
         
         self.paddle = Paddle(self.canvas)
         # Criamos a bola passando o canvas e a raquete (para futuras colisões)
-        self.ball = Ball(self.canvas, self.paddle)
+        self.ball = Ball(self.canvas, self.paddle, self.sound_manager)
         
         self.configurar_controles()
         # Iniciamos o ciclo de animação

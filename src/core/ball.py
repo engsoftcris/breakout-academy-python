@@ -1,15 +1,10 @@
 class Ball:
-    def __init__(self, canvas, paddle):
+    def __init__(self, canvas, paddle, sound_manager):
         self.canvas = canvas
         self.paddle = paddle
-        # Cria a bola (um círculo)
-        # Coordenadas: x1, y1, x2, y2
+        self.sound_manager = sound_manager # Recebe o gerente de som
         self.id = canvas.create_oval(10, 10, 25, 25, fill="red")
-        
-        # Define a posição inicial (meio da tela)
         self.canvas.move(self.id, 190, 250)
-        
-        # Velocidade inicial
         self.x = 3
         self.y = -3
         
@@ -17,22 +12,24 @@ class Ball:
         self.canvas.move(self.id, self.x, self.y)
         pos = self.canvas.coords(self.id)
         
-        # Quicar no topo
-        if pos[1] <= 0:
-            self.y = 3
-            
-        # Quicar no fundo (por enquanto, para não perdermos a bola)
-        if pos[3] >= 600:
-            self.y = -3
-            
-        # Quicar nas laterais
-        if pos[0] <= 0:
-            self.x = 3
-        if pos[2] >= 400:
-            self.x = -3
-        # Colisão com a Raquete
+        # 1. Colisão com laterais e topo (Bounce normal)
+        if pos[0] <= 0 or pos[2] >= 400 or pos[1] <= 0:
+            self.sound_manager.play_bounce()
+            if pos[0] <= 0: self.x = 3
+            if pos[2] >= 400: self.x = -3
+            if pos[1] <= 0: self.y = 3
+
+        # 2. Colisão com a raquete (Paddle Hit)
         if self.bater_na_raquete(pos):
-            self.y = -3 # Manda a bola para cima
+            self.y = -3
+            self.sound_manager.play_paddle()
+
+        # 3. Lógica do Fundo (O "Chão")
+        if pos[3] >= 600:
+            # PARA O TUTORIAL: Vamos fazer ela quicar, mas poderíamos disparar um som de erro
+            self.y = -3
+            # self.sound_manager.play_fail() # Futuro som de vida perdida
+            print("A bola tocou o chão!")
     
     def bater_na_raquete(self, pos_bola):
         pos_raquete = self.canvas.coords(self.paddle.id)
