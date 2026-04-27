@@ -1,51 +1,82 @@
-import tkinter as tk  # Importa a "caixa de ferramentas" para criar janelas e botões
-from src.core.game_engine import GameEngine  # Importa o "cérebro" do nosso jogo
+import tkinter as tk
+from src.core.game_engine import GameEngine
 
-def iniciar_app():
-    try:
-        # 1. CRIANDO A JANELA PRINCIPAL
-        root = tk.Tk()  # Cria a base de tudo, como se fosse a moldura de um quadro
-        root.title("Breakout Academy")  # Define o nome que aparece lá em cima na barra da janela
-
-        # 2. CALCULANDO O TAMANHO DA TELA DO ALUNO
-        # Aqui perguntamos ao computador qual o tamanho do monitor dele
-        largura_monitor = root.winfo_screenwidth()
-        altura_monitor = root.winfo_screenheight()
-
-        # Queremos que a janela ocupe 80% da tela (0.8), para não ficar nem gigante nem pequena
-        largura_janela = int(largura_monitor * 0.8)
-        altura_janela = int(altura_monitor * 0.8)
+class TutorialApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Breakout Academy")
         
-        # Fazemos uma conta matemática para descobrir onde é o meio exato da tela
-        pos_x = (largura_monitor // 2) - (largura_janela // 2)
-        pos_y = (altura_monitor // 2) - (altura_janela // 2)
+        # Configuração de tamanho (80% da tela) e centralização
+        largura = int(root.winfo_screenwidth() * 0.8)
+        altura = int(root.winfo_screenheight() * 0.8)
+        self.root.geometry(f"{largura}x{altura}")
+        self.root.configure(bg="#1e1e1e")
+
+        # Container principal que faz a troca das telas
+        self.main_container = tk.Frame(self.root, bg="#1e1e1e")
+        self.main_container.pack(expand=True, fill="both")
+
+        # Inicia pela tela de Boas-Vindas
+        self.mostrar_tela_boas_vindas()
+
+    def limpar_tela(self):
+        # Limpa a janela para carregar o próximo passo
+        for widget in self.main_container.winfo_children():
+            widget.destroy()
+
+    def mostrar_tela_boas_vindas(self):
+        self.limpar_tela()
         
-        # Aplicamos o tamanho e a posição centralizada na janela
-        root.geometry(f"{largura_janela}x{altura_janela}+{pos_x}+{pos_y}")
-        root.configure(bg="#1e1e1e")  # Pintamos o fundo da janela de cinza escuro
+        # Menu Inicial Centralizado
+        frame_menu = tk.Frame(self.main_container, bg="#1e1e1e")
+        frame_menu.place(relx=0.5, rely=0.5, anchor="center")
 
-        # 3. CRIANDO OS ESPAÇOS (CONTAINERS)
-        # O Frame funciona como uma "caixa" dentro da janela para organizar as coisas
-        main_container = tk.Frame(root, bg="#1e1e1e")
-        main_container.pack(expand=True, fill="both")  # Mandamos a caixa esticar para ocupar tudo
-
-        # 4. ONDE O JOGO ACONTECE (CANVAS)
-        # O Canvas é a nossa "folha de desenho" preta onde vamos desenhar a bola e os blocos
-        canvas = tk.Canvas(main_container, width=400, height=600, bg="black", highlightthickness=0)
-        canvas.pack(side="right", padx=50)  # Colocamos a folha de desenho à direita com um espaço (padx)
-
-        # 5. LIGANDO O MOTOR DO JOGO
-        # Aqui chamamos o motor (Engine) e entregamos a "folha de desenho" (canvas) para ele cuidar
-        engine = GameEngine(canvas)
-        engine.configurar_mundo()  # Mandamos o motor criar os blocos, a raquete e a bolinha
-
-        # 6. MANTENDO TUDO LIGADO
-        root.mainloop()  # Este comando diz ao computador: "Não feche a janela, fique rodando o jogo!"
+        tk.Label(frame_menu, text="BEM-VINDO AO", fg="white", bg="#1e1e1e", 
+                 font=("Arial", 16)).pack()
         
-    except Exception as e:
-        # Se acontecer algum erro (tipo esquecer um arquivo), ele avisa aqui embaixo no terminal
-        print(f"Erro ao iniciar a aplicação: {e}")
+        tk.Label(frame_menu, text="BREAKOUT ACADEMY", fg="#4CAF50", bg="#1e1e1e", 
+                 font=("Courier", 40, "bold")).pack(pady=10)
 
-# Este comando garante que o jogo só comece se rodarmos este arquivo diretamente
+        tk.Label(frame_menu, text="Onde você constrói seu próprio jogo de tijolos!", 
+                 fg="#cccccc", bg="#1e1e1e", font=("Arial", 12)).pack(pady=20)
+
+        # Botão para entrar no ambiente (por enquanto só muda a tela)
+        tk.Button(frame_menu, text="INICIAR JORNADA 🚀", 
+                  command=self.mostrar_ambiente_estudo,
+                  bg="#4CAF50", fg="white", font=("Arial", 14, "bold"), 
+                  padx=30, pady=15, cursor="hand2", relief="flat").pack(pady=20)
+
+    def mostrar_ambiente_estudo(self):
+        self.limpar_tela()
+        
+        # Frame que agrupa Painel e Jogo lado a lado no centro
+        conteudo = tk.Frame(self.main_container, bg="#1e1e1e")
+        conteudo.place(relx=0.5, rely=0.5, anchor="center")
+
+        # --- LADO ESQUERDO: PAINEL DE CONTROLE (VAZIO) ---
+        self.painel_controle = tk.Frame(conteudo, bg="#2d2d2d", width=400, height=600)
+        self.painel_controle.pack(side="left", fill="y", padx=20)
+        self.painel_controle.pack_propagate(False)
+
+        # Apenas um título de cabeçalho, sem instruções de missão ainda
+        tk.Label(self.painel_controle, text="PAINEL DE CÓDIGO", fg="#888888", 
+                 bg="#2d2d2d", font=("Courier", 18, "bold")).pack(pady=20)
+
+        # O botão fica aqui, mas não executa nada por enquanto
+        self.btn_executar = tk.Button(self.painel_controle, text="AGUARDANDO CÓDIGO...", 
+                                     state="disabled", bg="#444444", 
+                                     fg="#888888", font=("Arial", 12, "bold"), pady=10)
+        self.btn_executar.pack(side="bottom", fill="x", pady=20, padx=20)
+
+        # --- LADO DIREITO: ÁREA DO JOGO (VAZIA) ---
+        self.canvas = tk.Canvas(conteudo, width=400, height=600, 
+                                bg="#111111", highlightthickness=0)
+        self.canvas.pack(side="left", padx=20)
+        
+        # O motor não é iniciado aqui para o jogo não aparecer do nada
+        self.engine = None
+
 if __name__ == "__main__":
-    iniciar_app()
+    root = tk.Tk()
+    app = TutorialApp(root)
+    root.mainloop()
