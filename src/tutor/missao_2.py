@@ -1,5 +1,7 @@
 import tkinter as tk
 
+from src.tutor.missao_3 import carregar_missao_3
+
 def carregar_missao_2(container, root, cor_fundo):
     # 1. Limpeza de rastro e eventos
     root.unbind("<Left>")
@@ -90,8 +92,8 @@ def validar_missao(larg_str, vel_str, label, frame_proxima, container, root, cor
             for w in frame_proxima.winfo_children(): w.destroy()
             
             tk.Button(frame_proxima, text="MISSÃO 3: A BOLA ➡️", bg="#FF9800", fg="white", 
-                      font=("Arial", 12, "bold"), pady=15,
-                      command=lambda: print("Lançando Missão 3...")).pack(fill="x")
+            font=("Arial", 12, "bold"), pady=15,
+            command=lambda: carregar_missao_3(container, root, cor, l, v)).pack(fill="x")
         else:
             label.configure(text="❌ Valores fora do limite permitido!", fg="#FF5252")
     except ValueError:
