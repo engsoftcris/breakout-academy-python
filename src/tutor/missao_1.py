@@ -1,14 +1,16 @@
 import tkinter as tk
 from src.core.game_engine import GameEngine
+from src.tutor.missao_2 import carregar_missao_2
 
 def carregar_missao_1(container, root):
+    # Limpa o palco da AppPrincipal
     for widget in container.winfo_children():
         widget.destroy()
 
     conteudo = tk.Frame(container, bg="#1e1e1e")
     conteudo.place(relx=0.5, rely=0.5, anchor="center")
 
-    # --- PAINEL DE CONTROLE ---
+    # --- PAINEL DE CONTROLE (O LABORATÓRIO) ---
     painel = tk.Frame(conteudo, bg="#2d2d2d", width=420, height=600)
     painel.pack(side="left", fill="y", padx=20)
     painel.pack_propagate(False)
@@ -16,7 +18,7 @@ def carregar_missao_1(container, root):
     tk.Label(painel, text="🏗️ MISSÃO 1: O ARQUITETO", fg="#4CAF50", 
              bg="#2d2d2d", font=("Courier", 18, "bold")).pack(pady=15)
 
-    # --- MANUAL DA MISSÃO ---
+    # --- MANUAL DA MISSÃO (TEXTO QUE VOCÊ GOSTOU) ---
     missao_info = tk.Frame(painel, bg="#3d3d3d", padx=15, pady=10)
     missao_info.pack(fill="x", padx=25, pady=5)
     
@@ -41,12 +43,12 @@ def carregar_missao_1(container, root):
     )
     tk.Label(aprenda, text=info, fg="#e0e0e0", bg="#3d3d3d", font=("Arial", 9, "italic"), justify="left").pack(pady=5)
 
-    # PALETA
+    # PALETA TÉCNICA
     tk.Label(painel, text="🎨 PALETA DE CORES:", fg="#FFD700", bg="#2d2d2d", font=("Arial", 10, "bold")).pack(pady=(10,0))
     CORES = ["blue", "red", "green", "purple", "yellow", "orange", "black", "white"]
     tk.Label(painel, text=", ".join(CORES), fg="#4CAF50", bg="#2d2d2d", font=("Courier", 10, "bold"), wraplength=350).pack()
 
-    # EDITOR
+    # EDITOR DE CÓDIGO
     editor = tk.Frame(painel, bg="#1e1e1e", padx=20, pady=20, highlightbackground="#444", highlightthickness=1)
     editor.pack(fill="x", padx=25, pady=10)
 
@@ -62,51 +64,45 @@ def carregar_missao_1(container, root):
     lbl_feedback = tk.Label(painel, text="Aguardando comando...", fg="#888888", bg="#2d2d2d", font=("Arial", 11, "bold"))
     lbl_feedback.pack(pady=10)
 
-    # --- BOTÕES UM AO LADO DO OUTRO ---
+    # --- BOTÕES PADRONIZADOS ---
     frame_botoes = tk.Frame(painel, bg="#2d2d2d")
     frame_botoes.pack(fill="x", padx=25, pady=5)
 
     estilo_btn = {"font": ("Arial", 10, "bold"), "pady": 15, "fg": "white", "relief": "flat", "cursor": "hand2"}
 
-    # side="left" coloca um do lado do outro, expand=True faz eles dividirem o espaço
-    btn_testar = tk.Button(frame_botoes, text="🧪 TESTAR", bg="#2196F3", 
-                           command=lambda: validar_e_testar(ent_cor.get(), canvas, lbl_feedback, CORES), **estilo_btn)
-    btn_testar.pack(side="left", fill="x", expand=True, padx=2)
+    tk.Button(frame_botoes, text="🧪 TESTAR", bg="#2196F3", 
+              command=lambda: validar_e_testar(ent_cor.get(), canvas, lbl_feedback, CORES), **estilo_btn).pack(side="left", fill="x", expand=True, padx=2)
 
-    btn_validar = tk.Button(frame_botoes, text="✅ VALIDAR", bg="#4CAF50", 
-                           command=lambda: concluir_missao(ent_cor.get(), canvas, frame_botoes, lbl_feedback, CORES, container, root), **estilo_btn)
-    btn_validar.pack(side="left", fill="x", expand=True, padx=2)
+    tk.Button(frame_botoes, text="✅ VALIDAR", bg="#4CAF50", 
+              command=lambda: concluir_missao(ent_cor.get(), canvas, frame_botoes, lbl_feedback, CORES, container, root), **estilo_btn).pack(side="left", fill="x", expand=True, padx=2)
 
-    # --- TELA DO JOGO ---
+    # --- TELA DO JOGO (CANVAS) ---
     canvas = tk.Canvas(conteudo, width=400, height=600, bg="#111111", highlightthickness=2, highlightbackground="#444")
     canvas.pack(side="left", padx=20)
 
-# --- FUNÇÕES ---
+# --- FUNÇÕES DE LÓGICA ---
 
 def validar_e_testar(valor, canvas, label, lista):
     cor = valor.strip().lower()
-    if not cor:
-        label.configure(text="❌ ERRO: Digite uma cor!", fg="#FF5252")
-        return False
-    if cor not in lista:
-        label.configure(text=f"❌ ERRO: '{cor}' não existe!", fg="#FF5252")
-        return False
-    canvas.configure(bg=cor)
-    label.configure(text=f"✔️ String '{cor}' aceita!", fg="#4CAF50")
-    return True
+    if cor in lista:
+        canvas.configure(bg=cor)
+        label.configure(text=f"✔️ String '{cor}' aceita!", fg="#4CAF50")
+        return True
+    label.configure(text="❌ ERRO: Cor não reconhecida!", fg="#FF5252")
+    return False
 
 def concluir_missao(valor, canvas, frame_botoes, label, lista, container, root):
     if validar_e_testar(valor, canvas, label, lista):
-        engine = GameEngine(canvas)
-        canvas.delete("all") 
+        # A 'valor' aqui já é a cor que foi validada
+        cor_escolhida = valor 
+        
         for widget in frame_botoes.winfo_children():
             widget.destroy()
+        
         label.configure(text="✨ MISSÃO CUMPRIDA!", fg="#FFD700", font=("Arial", 14, "bold"))
-        btn_proxima = tk.Button(frame_botoes, text="CONSTRUIR RAQUETE ➡️", bg="#FF9800", fg="white", 
-                               font=("Arial", 14, "bold"), pady=15, command=lambda: carregar_missao_2(container, root))
-        btn_proxima.pack(fill="x", pady=20)
-
-def carregar_missao_2(container, root):
-    for widget in container.winfo_children():
-        widget.destroy()
-    tk.Label(container, text="🚀 MISSÃO 2: A RAQUETE", fg="white", bg="#1e1e1e", font=("Arial", 24)).place(relx=0.5, rely=0.5, anchor="center")
+        
+        # O BOTÃO AGORA PASSA A COR ADIANTE
+        tk.Button(frame_botoes, text="CONSTRUIR RAQUETE ➡️", bg="#FF9800", fg="white", 
+                  font=("Arial", 12, "bold"), pady=15,
+                  # Adicionamos 'cor_escolhida' como o terceiro argumento:
+                  command=lambda: carregar_missao_2(container, root, cor_escolhida)).pack(fill="x", pady=10)
