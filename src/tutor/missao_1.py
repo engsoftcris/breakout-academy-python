@@ -1,5 +1,4 @@
 import tkinter as tk
-from src.core.game_engine import GameEngine
 from src.tutor.missao_2 import carregar_missao_2
 
 def carregar_missao_1(container, root):

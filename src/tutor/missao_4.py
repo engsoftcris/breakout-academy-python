@@ -1,7 +1,7 @@
 import tkinter as tk
 import os
 import pygame
-#import src.tutor.missao_5 as m5  # Preparado para a próxima missão
+import src.tutor.missao_5 as m5  # Preparado para a próxima missão
 
 def carregar_missao_4(container, root, cor_fundo, larg_r, vel_r, callback_proxima=None):
     for widget in container.winfo_children():
